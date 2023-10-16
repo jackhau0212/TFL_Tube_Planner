@@ -1,5 +1,5 @@
 import json
-from components import Station, Line, Connection
+from tube.components import Station, Line, Connection
 
 
 class TubeMap:
@@ -61,14 +61,16 @@ class TubeMap:
                 
                 # If the station is not an integer, but a float, this means that the station belongs to 2 zones
                 else:
-                    zones_set = (int(zone_number), int(zone_number) + 1)
+                    zones_set = {int(zone_number), int(zone_number) + 1}
                     self.stations[station["id"]] = Station(id=station["id"], name=station["name"], zones=zones_set)
             
+            # Importing lines data
             for line in data["lines"]:
                 self.lines[line["line"]] = Line(id=line["line"], name=line["name"])
-                
+            
+            # Importing conecctions data
             for connection in data["connections"]:
-                stations_set = (self.stations.get(connection["station1"]), self.stations.get(connection["station2"]))
+                stations_set = {self.stations.get(connection["station1"]), self.stations.get(connection["station2"])}
                 line = self.lines.get(connection["line"])
                 self.connections.append(Connection(stations=stations_set, line=line, time=int(connection["time"])))
     
