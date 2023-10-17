@@ -11,15 +11,18 @@ class NeighbourGraphBuilder:
     def find_neighbouring_stations(self, station, tubemap):
         neighbouring_stations = set()
         
-        connections = tubemap.connections
-        
-        for connection in connections:
-            if station in connection.stations:
-                neighbouring_stations.update(connection.stations)
-                
-        neighbouring_stations.remove(station)
-        
-        return neighbouring_stations
+        try:        
+            connections = tubemap.connections
+            
+            for connection in connections:
+                if station in connection.stations:
+                    neighbouring_stations.update(connection.stations)
+                    
+            neighbouring_stations.remove(station)
+            
+            return neighbouring_stations
+        except:
+            return set()
 
     def build(self, tubemap):
         """ Builds a graph encoding neighbouring connections between stations.
@@ -83,28 +86,30 @@ class NeighbourGraphBuilder:
                 If the input data (tubemap) is invalid, 
                 the method should return an empty dict.
         """
-        
         graph = dict()
-        
-        for tube_id in tubemap.stations:
+        try:
             
-            neighbouring_stations = self.find_neighbouring_stations(station=tubemap.stations[tube_id], tubemap=tubemap)
+            for tube_id in tubemap.stations:
+                
+                neighbouring_stations = self.find_neighbouring_stations(station=tubemap.stations[tube_id], tubemap=tubemap)
+                
+                station_dict = dict()
+                
+                for neighbouring_station in neighbouring_stations:
+                    station_dict[neighbouring_station.id] = []
+                
+                
+                for connection in tubemap.connections:
+                    if tubemap.stations[tube_id] in connection.stations:
+                        neighbouring_station_id = list(connection.stations)
+                        neighbouring_station_id.remove(tubemap.stations[tube_id])
+                        station_dict[neighbouring_station_id[0].id].append(connection)
+                
+                graph[tube_id] = station_dict
             
-            station_dict = dict()
-            
-            for neighbouring_station in neighbouring_stations:
-                station_dict[neighbouring_station.id] = []
-            
-            
-            for connection in tubemap.connections:
-                if tubemap.stations[tube_id] in connection.stations:
-                    neighbouring_station_id = list(connection.stations)
-                    neighbouring_station_id.remove(tubemap.stations[tube_id])
-                    station_dict[neighbouring_station_id[0].id].append(connection)
-            
-            graph[tube_id] = station_dict
-        
-        return graph
+            return graph
+        except:
+            return dict()
 
 
 def test_graph():
@@ -116,7 +121,7 @@ def test_graph():
     graph = graph_builder.build(tubemap)
 
     print(tubemap.stations["89"])
-    print(graph["89"])
+    print(graph)
 
 
 if __name__ == "__main__":
