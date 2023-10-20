@@ -21,7 +21,7 @@ class NeighbourGraphBuilder:
             neighbouring_stations.remove(station)
             
             return neighbouring_stations
-        except:
+        except TypeError:
             return set()
 
     def build(self, tubemap):
@@ -91,7 +91,9 @@ class NeighbourGraphBuilder:
             
             for tube_id in tubemap.stations:
                 
-                neighbouring_stations = self.find_neighbouring_stations(station=tubemap.stations[tube_id], tubemap=tubemap)
+                neighbouring_stations = self.find_neighbouring_stations(
+                    station=tubemap.stations[tube_id], tubemap=tubemap
+                    )
                 
                 station_dict = dict()
                 
@@ -108,7 +110,7 @@ class NeighbourGraphBuilder:
                 graph[tube_id] = station_dict
             
             return graph
-        except:
+        except TypeError:
             return dict()
 
 
@@ -120,7 +122,6 @@ def test_graph():
     graph_builder = NeighbourGraphBuilder()
     graph = graph_builder.build(tubemap)
 
-    print(tubemap.stations["89"])
     print(graph)
 
 
