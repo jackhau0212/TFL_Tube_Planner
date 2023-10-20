@@ -18,9 +18,17 @@ class PathFinder:
         graph_builder = NeighbourGraphBuilder()
         self.graph = graph_builder.build(self.tubemap)
         
-        # Feel free to add anything else needed here.
     
     def find_station_id_from_name(self, station_name):
+        """
+        Find the station id from the string name
+
+        Args:
+            station_name (string): name of the station
+
+        Returns:
+            string: station id
+        """
         station_id = ""
         
         for station in self.tubemap.stations:
@@ -68,6 +76,10 @@ class PathFinder:
                 start_station_name and end_station_name are the same.
         """
         
+        if not self.find_station_id_from_name(start_station_name) in self.tubemap.stations and \
+            not self.find_station_id_from_name(end_station_name) in self.tubemap.stations:
+            return None
+        
         # Create a dictionary to store the distance from the start station to each node
         distance = {node: float("infinity") for node in self.graph}
         
@@ -83,33 +95,44 @@ class PathFinder:
         
         while unvisted_stations:
             
-            # The fixed station is the station that is still unvisited with the lowest distance value
+            # Need to find the starting fixed station
+            
+            # Find out the stations that are in the distance that have been visited
             unvisited_distance_intersection = set(distance) - set(unvisted_stations)
             unvisited_distance = distance
             
+            # Remove the stations from unvisited_distance dictionary that have been visited
             for i in unvisited_distance_intersection:
                 unvisited_distance.pop(i)
             
+            # Find out the station in the unvisited_distance dictionary with the lowest distance value
             fixed_station_id = min(unvisited_distance, key=unvisited_distance.get)
             
+            # Remove the fixed station from unvisited_stations because we are currently on it
             unvisted_stations.remove(fixed_station_id)
             
+            # Find out the stations that are connected to the fixed station which are unvisited
             unvisted_connected_stations = [connected_station for connected_station in self.graph[fixed_station_id] if connected_station in unvisted_stations]
             
+            # Looping through all the unvisited_connected_stations
             for unvisited_connected_station in unvisted_connected_stations:
                 
                 shortest = float("infinity")
                 
+                # Finding out the quickest way between 2 stations
+                # Taking into account of stations that have multiple connections
                 for connection in self.graph[fixed_station_id][unvisited_connected_station]:
                     if connection.time < shortest:
                         shortest = connection.time
                 
                 alt = distance[fixed_station_id] + shortest
                 
+                # Update the distance dictionary if a more optimal route is found
                 if alt < distance[unvisited_connected_station]:
                     distance[unvisited_connected_station] = alt
                     previous[unvisited_connected_station] = self.tubemap.stations[fixed_station_id]
         
+        # Creating a list of stations of the route
         route = []
         target_station_id = self.find_station_id_from_name(end_station_name)
         
@@ -129,13 +152,13 @@ def test_shortest_path():
     tubemap.import_from_json("data/london.json")
     
     path_finder = PathFinder(tubemap)
-    stations = path_finder.get_shortest_path("Golders Green", "Green Park")
+    stations = path_finder.get_shortest_path("Covent Garden", "Green Park")
     print(stations)
     
-    # station_names = [station.name for station in stations]
-    # expected = ["Covent Garden", "Leicester Square", "Piccadilly Circus", 
-    #             "Green Park"]
-    # assert station_names == expected
+    station_names = [station.name for station in stations]
+    expected = ["Covent Garden", "Leicester Square", "Piccadilly Circus", 
+                "Green Park"]
+    assert station_names == expected
 
 if __name__ == "__main__":
     test_shortest_path()
