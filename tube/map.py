@@ -1,4 +1,5 @@
 import json
+from json.decoder import JSONDecodeError
 from tube.components import Station, Line, Connection
 
 
@@ -74,7 +75,10 @@ class TubeMap:
                 line = self.lines.get(connection["line"])
                 self.connections.append(Connection(stations=stations_set, line=line, time=int(connection["time"])))
     
-        except:
+        except FileNotFoundError:
+            pass
+        
+        except JSONDecodeError:
             pass
         
         return
@@ -99,10 +103,4 @@ def test_import():
 
 if __name__ == "__main__":
     test_import()
-    
-    
-    #######################################################
-    # tubemap = TubeMap()
-    
-    # tubemap.import_from_json("data/london.json")
     
