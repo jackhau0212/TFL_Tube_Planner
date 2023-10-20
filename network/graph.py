@@ -9,18 +9,31 @@ class NeighbourGraphBuilder:
         pass
 
     def find_neighbouring_stations(self, station, tubemap):
+        """
+        Finding all the neighbouring stations
+
+        Args:
+            station (Station Class): the target station
+            tubemap (Tube Map Class): the tube map data
+
+        Returns:
+            Set: a set of stations that are connected to the target station
+        """
         neighbouring_stations = set()
         
         try:        
             connections = tubemap.connections
             
+            # Loops through all the connections
             for connection in connections:
                 if station in connection.stations:
                     neighbouring_stations.update(connection.stations)
-                    
+            
+            # Remove the target station from the set
             neighbouring_stations.remove(station)
             
             return neighbouring_stations
+        
         except TypeError:
             return set()
 
@@ -89,18 +102,20 @@ class NeighbourGraphBuilder:
         graph = dict()
         try:
             
+            # Loops through all the stations in the tubemap
             for tube_id in tubemap.stations:
                 
+                # Find the neighbouring stations
                 neighbouring_stations = self.find_neighbouring_stations(
                     station=tubemap.stations[tube_id], tubemap=tubemap
                     )
                 
+                # Go through all the neighbouring stations and initiate a dictionary
                 station_dict = dict()
-                
                 for neighbouring_station in neighbouring_stations:
                     station_dict[neighbouring_station.id] = []
                 
-                
+                # Go through all the connections and sort all the connections
                 for connection in tubemap.connections:
                     if tubemap.stations[tube_id] in connection.stations:
                         neighbouring_station_id = list(connection.stations)
@@ -110,6 +125,7 @@ class NeighbourGraphBuilder:
                 graph[tube_id] = station_dict
             
             return graph
+        
         except TypeError:
             return dict()
 
