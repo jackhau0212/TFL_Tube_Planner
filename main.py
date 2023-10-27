@@ -18,7 +18,7 @@ def main():
     path_finder = PathFinder(tubemap)
 
     # Examples usage of path_finder
-    stations = path_finder.get_shortest_path('Stockwell', 'Ealing Broadway')
+    stations = path_finder.get_shortest_path('Stockwell', 'Stockwells')
     station_names = [station.name for station in stations]
     print(station_names)
 

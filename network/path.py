@@ -76,7 +76,7 @@ class PathFinder:
                 start_station_name and end_station_name are the same.
         """
         
-        if not self.find_station_id_from_name(start_station_name) in self.tubemap.stations and \
+        if not self.find_station_id_from_name(start_station_name) in self.tubemap.stations or \
             not self.find_station_id_from_name(end_station_name) in self.tubemap.stations:
             return None
         
@@ -152,7 +152,7 @@ def test_shortest_path():
     tubemap.import_from_json("data/london.json")
     
     path_finder = PathFinder(tubemap)
-    stations = path_finder.get_shortest_path("Covent Garden", "Green Park")
+    stations = path_finder.get_shortest_path("Covent Gardens", "Green Park")
     print(stations)
     
     station_names = [station.name for station in stations]
